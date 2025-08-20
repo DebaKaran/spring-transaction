@@ -1,3 +1,5 @@
+server:
+  port: 9191
 spring:
   application:
     name: spring-transaction-mgmt
@@ -17,3 +19,14 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always # run even for non-embedded DBs like MySQL
+      platform: mysql # lets Boot look f  or data-mysql.sql if present
+      data-locations:
+        - classpath:database/data.sql # explicitly point to your custom path
+  docker:
+    compose:
+      file: spring-transaction-mgmt/compose.yaml # path to your Docker Compose file
+      enabled: true # enable Docker Compose support
