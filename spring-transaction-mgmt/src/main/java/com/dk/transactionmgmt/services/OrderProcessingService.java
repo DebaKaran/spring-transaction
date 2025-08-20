@@ -21,7 +21,7 @@ public class OrderProcessingService {
         this.inventoryHandler = inventoryHandler;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Order placeAnOrder(Order order) {
         // 1: get product from inventory
         Product product =  inventoryHandler.getProduct(order.getProductId());
