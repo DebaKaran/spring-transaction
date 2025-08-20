@@ -5,6 +5,9 @@ import com.dk.transactionmgmt.entities.Product;
 import com.dk.transactionmgmt.handlers.InventoryHandler;
 import com.dk.transactionmgmt.handlers.OrderHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderProcessingService {
@@ -18,6 +21,7 @@ public class OrderProcessingService {
         this.inventoryHandler = inventoryHandler;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Order placeAnOrder(Order order) {
         // 1: get product from inventory
         Product product =  inventoryHandler.getProduct(order.getProductId());
