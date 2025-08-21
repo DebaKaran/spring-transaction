@@ -4,6 +4,7 @@ import com.dk.transactionmgmt.entities.Order;
 import com.dk.transactionmgmt.services.OrderProcessingService;
 import com.dk.transactionmgmt.services.isolations.ReadCommittedDemo;
 import com.dk.transactionmgmt.services.isolations.ReadUncommittedDemo;
+import com.dk.transactionmgmt.services.isolations.RepeatableReadDemo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +15,16 @@ public class OrderProcessingController {
     private final OrderProcessingService orderProcessingService;
     private final ReadUncommittedDemo readUncommittedDemo;
     private final ReadCommittedDemo committedDemo;
+    private final RepeatableReadDemo repeatableReadDemo;
 
     public OrderProcessingController(OrderProcessingService orderProcessingService,
                                      ReadUncommittedDemo readUncommittedDemo,
-                                     ReadCommittedDemo committedDemo) {
+                                     ReadCommittedDemo committedDemo,
+                                     RepeatableReadDemo repeatableReadDemo) {
         this.orderProcessingService = orderProcessingService;
         this.readUncommittedDemo = readUncommittedDemo;
         this.committedDemo = committedDemo;
+        this.repeatableReadDemo = repeatableReadDemo;
     }
 
     /**
@@ -37,7 +41,8 @@ public class OrderProcessingController {
     @GetMapping("/isolation")
     public String testIsolation() throws InterruptedException {
         //readUncommittedDemo.testReadUncommitted(1);
-        committedDemo.testReadCommitted(1);
+        //committedDemo.testReadCommitted(1);
+        repeatableReadDemo.demonstrateRepeatableRead(1);
         return "success";
     }
 }

@@ -55,4 +55,26 @@ public class ProductService {
         System.out.println("Transaction B: Read stock as " + product.getStockQuantity());
         return product.getStockQuantity();
     }
+
+    // Transaction B: Read stock multiple times
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void fetchStock(int productId) {
+
+        // First read
+        Product product1 = inventoryRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        System.out.println("Transaction B: First read stock as " + product1.getStockQuantity());//40
+
+        // Simulate a delay to allow Transaction A to update the stock
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Second read
+        Product product2 = inventoryRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        System.out.println("Transaction B: Second read stock as " + product2.getStockQuantity());//40
+    }
 }
