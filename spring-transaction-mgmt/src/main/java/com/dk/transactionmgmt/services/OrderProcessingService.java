@@ -2,10 +2,7 @@ package com.dk.transactionmgmt.services;
 
 import com.dk.transactionmgmt.entities.Order;
 import com.dk.transactionmgmt.entities.Product;
-import com.dk.transactionmgmt.handlers.AuditLogHandler;
-import com.dk.transactionmgmt.handlers.InventoryHandler;
-import com.dk.transactionmgmt.handlers.OrderHandler;
-import com.dk.transactionmgmt.handlers.PaymentValidatorHandler;
+import com.dk.transactionmgmt.handlers.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,18 +19,22 @@ public class OrderProcessingService {
 
     private final PaymentValidatorHandler paymentValidatorHandler;
 
+    private final NotificationHandler notificationHandler;
+
     public OrderProcessingService(OrderHandler orderHandler,
                                   InventoryHandler inventoryHandler,
                                   AuditLogHandler auditLogHandler,
-                                  PaymentValidatorHandler paymentValidatorHandler) {
+                                  PaymentValidatorHandler paymentValidatorHandler,
+                                  NotificationHandler notificationHandler) {
         this.orderHandler = orderHandler;
         this.inventoryHandler = inventoryHandler;
         this.auditLogHandler = auditLogHandler;
         this.paymentValidatorHandler = paymentValidatorHandler;
+        this.notificationHandler = notificationHandler;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Order placeAnOrder(Order order) {
+    public Order processAnOrder(Order order) {
         // 1: get product from inventory
         Product product =  inventoryHandler.getProduct(order.getProductId());
 
@@ -59,7 +60,22 @@ public class OrderProcessingService {
         }
 
         paymentValidatorHandler.validatePayment(order);
+
+        //throw IllegalTransactionStateException
+        //notificationHandler.sendOrderConfirmationNotification(order);
+
         return savedOrder;
+    }
+
+    //call this method from controller 
+    public Order placeAnOrder(Order order) {
+        //process the order
+        Order savedOrder = processAnOrder(order);
+
+        //Send notification - Non-transactional
+        notificationHandler.sendOrderConfirmationNotification(savedOrder);
+        return savedOrder;
+
     }
 
     private void updateInventoryStock(Order order, Product product) {
