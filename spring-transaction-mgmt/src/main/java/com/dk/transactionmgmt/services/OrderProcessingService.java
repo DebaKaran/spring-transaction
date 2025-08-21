@@ -68,7 +68,9 @@ public class OrderProcessingService {
         //throw IllegalTransactionStateException
         //notificationHandler.sendOrderConfirmationNotification(order);
         recommendationHandler.getRecommendations();
-        
+
+        getCustomerDetails();
+
         return savedOrder;
     }
 
@@ -81,6 +83,11 @@ public class OrderProcessingService {
         notificationHandler.sendOrderConfirmationNotification(savedOrder);
         return savedOrder;
 
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void getCustomerDetails() {
+        System.out.println("Customer details fetched...");
     }
 
     private void updateInventoryStock(Order order, Product product) {
