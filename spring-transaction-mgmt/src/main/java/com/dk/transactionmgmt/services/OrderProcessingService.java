@@ -2,6 +2,7 @@ package com.dk.transactionmgmt.services;
 
 import com.dk.transactionmgmt.entities.Order;
 import com.dk.transactionmgmt.entities.Product;
+import com.dk.transactionmgmt.handlers.AuditLogHandler;
 import com.dk.transactionmgmt.handlers.InventoryHandler;
 import com.dk.transactionmgmt.handlers.OrderHandler;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,14 @@ public class OrderProcessingService {
 
     private final InventoryHandler inventoryHandler;
 
-    public OrderProcessingService(OrderHandler orderHandler, InventoryHandler inventoryHandler) {
+    private final AuditLogHandler auditLogHandler;
+
+    public OrderProcessingService(OrderHandler orderHandler,
+                                  InventoryHandler inventoryHandler,
+                                  AuditLogHandler auditLogHandler) {
         this.orderHandler = orderHandler;
         this.inventoryHandler = inventoryHandler;
+        this.auditLogHandler = auditLogHandler;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -33,13 +39,19 @@ public class OrderProcessingService {
 
         //3: update total price in order entity
         order.setTotalPrice(order.getQuantity() * product.getPrice());
+        Order savedOrder = null;
 
-        //4: save order
-        Order savedOrder = orderHandler.saveOrder(order);
+        try {
+            //4: save order
+            savedOrder = orderHandler.saveOrder(order);
 
-        //5: update stock in inventory
-        updateInventoryStock(order, product);
+            //5: update stock in inventory
+            updateInventoryStock(order, product);
 
+            auditLogHandler.logAuditDetails(order, "Order placement succeed...");
+        } catch (Exception e){
+            auditLogHandler.logAuditDetails(order, "Order placement failed...");
+        }
         return savedOrder;
     }
 
