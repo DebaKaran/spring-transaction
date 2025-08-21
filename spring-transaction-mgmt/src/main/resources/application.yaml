@@ -30,3 +30,16 @@ spring:
     compose:
       file: spring-transaction-mgmt/compose.yaml # path to your Docker Compose file
       enabled: true # enable Docker Compose support
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa:
+            JpaTransactionManager: DEBUG # set logging level for JPA Transaction management
+        transaction: DEBUG # set logging level for Spring Transaction management
+      hibernate:
+        transaction: DEBUG # set logging level for Hibernate Transaction management
+
+  file:
+    name: logs/spring-transaction-mgmt.log # log file location
