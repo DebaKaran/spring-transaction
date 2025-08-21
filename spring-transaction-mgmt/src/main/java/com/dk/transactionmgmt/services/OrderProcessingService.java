@@ -21,16 +21,20 @@ public class OrderProcessingService {
 
     private final NotificationHandler notificationHandler;
 
+    private final ProductRecommendationHandler recommendationHandler;
+
     public OrderProcessingService(OrderHandler orderHandler,
                                   InventoryHandler inventoryHandler,
                                   AuditLogHandler auditLogHandler,
                                   PaymentValidatorHandler paymentValidatorHandler,
-                                  NotificationHandler notificationHandler) {
+                                  NotificationHandler notificationHandler,
+                                  ProductRecommendationHandler recommendationHandler) {
         this.orderHandler = orderHandler;
         this.inventoryHandler = inventoryHandler;
         this.auditLogHandler = auditLogHandler;
         this.paymentValidatorHandler = paymentValidatorHandler;
         this.notificationHandler = notificationHandler;
+        this.recommendationHandler = recommendationHandler;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -63,7 +67,8 @@ public class OrderProcessingService {
 
         //throw IllegalTransactionStateException
         //notificationHandler.sendOrderConfirmationNotification(order);
-
+        recommendationHandler.getRecommendations();
+        
         return savedOrder;
     }
 
