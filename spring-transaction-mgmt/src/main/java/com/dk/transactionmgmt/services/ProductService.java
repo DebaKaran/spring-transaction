@@ -22,7 +22,9 @@ public class ProductService {
     private EntityManager entityManager;
 
     // Transaction A:
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    //@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    //@Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void updateStock(int productId, int stock) throws InterruptedException {
 
         // Retrieve the product and update its stock
@@ -45,7 +47,9 @@ public class ProductService {
     }
 
     // Transaction B: Read stock
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    //@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    //@Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public int checkStock(int productId) {
 
         // Retrieve the product and read its stock (potentially dirty read)
