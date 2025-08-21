@@ -17,8 +17,8 @@ public class PaymentValidatorHandler {
     @Autowired
     private AuditLogRepository auditLogRepository;
 
-    //@Transactional(propagation = Propagation.NESTED)
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.NESTED)
+    //@Transactional(propagation = Propagation.MANDATORY)
     public void validatePayment(Order order) {
         // Assume payment processing happens here
         boolean paymentSuccessful = false;
