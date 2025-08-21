@@ -5,6 +5,7 @@ import com.dk.transactionmgmt.entities.Product;
 import com.dk.transactionmgmt.handlers.AuditLogHandler;
 import com.dk.transactionmgmt.handlers.InventoryHandler;
 import com.dk.transactionmgmt.handlers.OrderHandler;
+import com.dk.transactionmgmt.handlers.PaymentValidatorHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,12 +20,16 @@ public class OrderProcessingService {
 
     private final AuditLogHandler auditLogHandler;
 
+    private final PaymentValidatorHandler paymentValidatorHandler;
+
     public OrderProcessingService(OrderHandler orderHandler,
                                   InventoryHandler inventoryHandler,
-                                  AuditLogHandler auditLogHandler) {
+                                  AuditLogHandler auditLogHandler,
+                                  PaymentValidatorHandler paymentValidatorHandler) {
         this.orderHandler = orderHandler;
         this.inventoryHandler = inventoryHandler;
         this.auditLogHandler = auditLogHandler;
+        this.paymentValidatorHandler = paymentValidatorHandler;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -52,6 +57,8 @@ public class OrderProcessingService {
         } catch (Exception e){
             auditLogHandler.logAuditDetails(order, "Order placement failed...");
         }
+
+        paymentValidatorHandler.validatePayment(order);
         return savedOrder;
     }
 
